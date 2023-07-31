@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Função para verificar se o Git está instalado
+check_git_installed() {
+  if ! command -v git &> /dev/null; then
+    echo -e "\033[31mErro: Git não está instalado na sua máquina.\033[0m"
+    exit 1
+  fi
+}
+
+# Função para verificar se a mensagem de commit segue o Conventional Commits Pattern
+check_commit_message() {
+  local commit_message="$1"
+  local pattern='^(build|ci|docs|feat|fix|perf|refactor|style|test|chore)(\([^\)]+\))?(!)?: .{1,100}$'
+
+  if ! [[ $commit_message =~ $pattern ]]; then
+    echo -e "\033[31mErro: A mensagem do commit não segue o padrão Conventional Commits.\033[0m"
+    echo -e "\033[31mPadrão esperado: '<type>(<escopo>): <descrição>'.\033[0m"
+    echo -e "\033[31mExemplo: 'feat: adicionar nova funcionalidade'.\033[0m"
+    exit 1
+  fi
+}
+
+# Verifica se o Git está instalado
+check_git_installed
+
+# Obtém a mensagem de commit a partir dos argumentos
+commit_message="$*"
+
+# Verifica se a mensagem de commit segue o padrão
+check_commit_message "$commit_message"
+
+# Se chegou até aqui, a mensagem de commit está correta
+echo -e "\033[34mMensagem de commit válida! Ótimo trabalho! 👍\033[0m"
+
+# Realiza o commit utilizando o comando git commit
+git commit -m "$commit_message"
